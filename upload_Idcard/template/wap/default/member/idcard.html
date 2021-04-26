@@ -1,0 +1,29 @@
+{extend name="$base" /}
+{block name="resources"}
+<style>
+    .frontIdCard {
+        width: 100%;
+        height: 200px;
+        border: 1px solid #3B6273;
+    }
+    .backIdCard {
+        width: 100%;
+        height: 200px;
+        border: 1px solid #3B6273;
+    }
+    .idcard-img{
+        height: 100px;
+        width: auto;
+    }
+</style>
+{/block}
+{block name="head_href"}{:__URL('APP_MAIN/member')}{/block}
+{block name="main"}
+<div class="com-content">
+
+</div>
+<script src="WAP_JS/member_idcard.js"></script>
+
+{/block}
+{block name="footer"}{/block}
+

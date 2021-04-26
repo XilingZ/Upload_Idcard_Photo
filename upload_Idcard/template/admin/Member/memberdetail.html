@@ -1,0 +1,871 @@
+{extend name="admin/base" /}
+{block name="resources"}
+<link rel="stylesheet" type="text/css" href="ADMIN_CSS/member_detail.css" />
+<style type="text/css">
+	#account_update .modal-header ul li{
+		display: inline-block;
+		width: 100px;
+		text-align: center;
+	}
+	#account_update .modal-header ul li:hover{
+		cursor:pointer;
+	}
+	.modal-header .close {
+		position: absolute;
+		right: 20px;
+	}
+	.account_active{
+		border-bottom: 2px solid #4685fd;
+	}
+	#memberList tr td:nth-child(4){
+		color: #F79136;
+		text-align: right;
+	}
+	#memberList tr td:nth-child(5){
+		color: #126AE4;
+		text-align: right;	
+	}
+	.edit-group{border-bottom: 1px solid #ebebeb;margin-bottom:10px;    padding-bottom: 13px;}
+	.edit-group label{font-weight:normal;}
+	.edit-group-title{height:15px;line-height:15px;width:140px;margin-top:3px;margin-bottom:3px;color:#4685fd;}
+	.edit-group-button{border: 1px solid #bbb;height: 26px;line-height: 24px;padding: 0 5px;}
+	.clear {
+		clear: both;
+	}
+	.label-bg {
+		height: 20px;
+		font-size: 12px;
+		text-align: center;
+		background-color: #FF6600;
+		color: #fff;
+		border-radius: 1px;
+		padding: 1px 3px;
+		margin-right: 3px;
+	}
+	.popover.bottom .popover-content{
+		max-height: 200px;
+		overflow-y: scroll;
+	}
+	.popover {
+		position: fixed !important;
+	}
+
+	label,input,select{
+		display: inline;
+	}
+
+	.curuser td{
+		background-color: rgb(220, 220, 253);
+	}
+
+	.idcard-img{
+		width:300px;
+		height:auto;
+	}
+	</style>
+
+
+
+
+{/block}
+{block name="main"}
+
+<!-- 账户调整 -->
+<div class="modal fade hide" id="account_update" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<ul class="account_ul">
+					<li class="account_active">
+						<h3>调整积分</h3>
+					</li>
+					<li>
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+						<h3>调整余额</h3>
+					</li>
+				</ul>
+			</div>
+			<div class="account-point">
+				<div class="modal-body">
+					<div class="modal-infp-style">
+						<table>
+							<tr>
+								<td>当前积分</td>
+								<td colspan='3' id="current_point" class="input-common"></td>
+							</tr>
+							<tr>
+								<td>调整积分</td>
+								<td colspan='3'>
+									<input type="number" id="point" class="input-common harf">
+									<em class="unit">分</em>
+									<p class="hint">输入负数表示为减少</p>
+								</td>
+							</tr>
+							<tr>
+								<td>备注</td>
+								<td colspan='3'><textarea id="remark_point" class="textarea-common"></textarea></td>
+							</tr>
+						</table>
+						
+					</div>
+				</div>
+				<div class="modal-footer">
+					<input type="hidden" id="point_id" />
+					<button class="btn-common btn-big" onclick="addAccount(1)">保存</button>
+					<button class="btn-common-cancle btn-big" data-dismiss="modal">关闭</button>
+				</div>
+			</div>
+			
+			<div class="account-balance"  style="display: none;">
+				<div class="modal-body">
+					<div class="modal-infp-style">
+						<table>
+							<tr>
+								<td>当前余额</td>
+								<td colspan='3' id="current_balance" class="input-common" ></td>
+							</tr>
+							<tr>
+								<td>调整金额</td>
+								<td colspan='3'>
+									<input type="number" id="balance" class="input-common harf" /><em class="unit">{$web_info.money_unit}</em>
+									<p class="hint">输入负数表示为减少</p>
+								</td>
+							</tr>
+							<tr>
+								<td>备注</td>
+								<td colspan='3'><textarea id="remark_balance" class="textarea-common"></textarea></td>
+							</tr>
+						</table>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<input type="hidden" id="balance_id" />
+					<button class="btn-common btn-big" onclick="addAccount(2)">保存</button>
+					<button class="btn-common-cancle btn-big" data-dismiss="modal">关闭</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+
+<div class="set-style">
+	<h4><span></span>基本信息</h4>
+	<dl>
+		<dt>会员头像：</dt>
+		<dd>
+			<div class="member-img">
+				{if condition="$member_detail['user_info']['user_headimg']"}
+					<img src="{:__IMG($member_detail['user_info']['user_headimg'])}">
+				{else /}
+					<img src="{:__IMG($default_headimg)}">
+				{/if}
+				
+			</div>
+		</dd>
+	</dl>
+	<dl>
+		<dt>用户名：</dt>
+		<dd>
+			{if condition="$member_detail['member_name']"}{$member_detail['member_name']}{else /}--{/if}
+		</dd>
+	</dl>
+	<dl>
+		<dt>等级：</dt>
+		<dd>
+			{if condition="$member_detail['level_name']"}{$member_detail['level_name']}{else /}--{/if}
+		</dd>
+	</dl>
+	<dl>
+		<dt>积分：</dt>
+		<dd>
+			{$member_detail['point']}
+		</dd>
+	</dl>
+	<dl>
+		<dt>余额：</dt>
+		<dd>
+			{$member_detail['balance']}
+		</dd>
+	</dl>
+	<dl>
+		<dt>标签：</dt>
+		<dd>
+			{if condition="$member_detail['label_name']"}{$member_detail['label_name']}{else /}--{/if}
+		</dd>
+	</dl>
+	<dl>
+		<dt>最后登录：</dt>
+		<dd>
+			{if condition="$member_detail['user_info']['current_login_time']"}{:date('Y-m-d H:i:s',$member_detail['user_info']['current_login_time'])}{else /}--{/if}
+		</dd>
+	</dl>
+	<dl>
+		<dt>身份证照片：</dt>
+		<dd>
+			<img src="__ROOT__/template/wap/default/public/img/id_card/{$idcard_front_url}" id="front_img" class="idcard-img">
+			<img src="__ROOT__/template/wap/default/public/img/id_card/{$idcard_back_url}" id="back_img" class="idcard-img">
+		</dd>
+	</dl>
+
+	<h4><span></span>会员功能</h4>
+	<dl>
+		<dt>操作：</dt>
+		<dd>
+			<button type="button" onclick="account_update({$member_detail['uid']},{$member_detail['point']},{$member_detail['balance']})" class="btn-common">积分/余额调整</button>
+			<button type="button" onclick="giveCoupon({$member_detail['uid']})" class="btn-common">送优惠券</button>
+			<button type="button" onclick="user_login({$member_detail['uid']})" class="btn-common">会员登录</button>
+			<button type="button" onclick="modify_password()" class="btn-common">重置密码</button>
+		</dd>
+	</dl>
+	{if condition="$member_detail['user_info']['is_system'] != 1"}
+	<dl>
+		<dt>会员状态：</dt>
+		<dd>
+			{if condition="$member_detail['user_info']['user_status']==0"}
+				<span style="color: red;">已锁定</span> <button type="button" onclick="unlockuser({$member_detail['uid']})" class="btn-common">解锁</button>
+			{else /}
+				<span style="color: green;">可用</span>  <button type="button" onclick="lockuser({$member_detail['uid']})" class="btn-common">锁定</button>
+			{/if}
+		</dd>
+	</dl>
+	<dl>
+		<dt>账户合并：</dt>
+		<dd>
+			<button type="button" onclick="selectCombine({$member_detail['uid']})" class="btn-danger">账户合并</button>
+			<span style="color: red;">选择一个账户与当前页面账户进行合并，操作前请核对需要合并的两个账户信息是否属于同一个用户，高风险操作，此操作不可逆转，谨慎操作！</span>
+		</dd>
+	</dl>
+	{/if}
+	<h4><span></span>个人信息</h4>
+	<dl>
+		<dt>昵称：</dt>
+		<dd>
+			{if condition="$member_detail['user_info']['nick_name']"}
+			{$member_detail['user_info']['nick_name']}
+			{else /}--{/if}
+		</dd>
+	</dl>
+	<dl>
+		<dt>标签：</dt>
+		<dd>
+			{if condition="$member_detail['label_name']"}{$member_detail['label_name']}{else /}--{/if}
+		</dd>
+	</dl>
+	<dl>
+		<dt>手机号：</dt>
+		<dd>
+			{if condition="$member_detail['user_info']['user_tel']"}
+			{$member_detail['user_info']['user_tel']}
+			{else /}--{/if}
+		</dd>
+	</dl>
+	<dl>
+		<dt>性别：</dt>
+		<dd>
+			{if condition="$member_detail['user_info']['sex'] eq 1"}
+				<span>男</span>
+			{elseif condition="$member_detail['user_info']['sex'] eq 2"}
+				<span>女</span>
+			{else /}
+				<span>保密</span>
+			{/if}
+		</dd>
+	</dl>
+	<dl>
+		<dt>邮箱：</dt>
+		<dd>
+			{if condition="$member_detail['user_info']['user_email']"}
+			<span>{$member_detail['user_info']['user_email']}</span>
+			{else /}
+			<span>--</span>
+			{/if}
+		</dd>
+	</dl>
+	<dl>
+		<dt>QQ：</dt>
+		<dd>
+			{if condition="$member_detail['user_info']['user_qq']"}
+			<span>{$member_detail['user_info']['user_qq']}</span>
+			{else /}
+			<span>--</span>
+			{/if}
+		</dd>
+	</dl>
+	<h4><span></span>交易信息</h4>
+	<!-- 交易信息 -->
+	<div class="member-order">
+			<div>
+				<div class="member-fileds-info">
+					<span>累计消费：</span>
+					<span>{$web_info.money_sign}{$member_detail['order_money']}</span>
+				</div>
+				<div class="member-fileds-info">
+					<span>消费次数：</span>
+					<span>{$member_detail['order_count']}</span>
+				</div>
+				<div class="member-fileds-info">
+					<span>平均消费金额：</span>
+					<span>{$web_info.money_sign}{$member_detail['avg_order_money']}</span>
+				</div>
+				<div class="member-fileds-info">
+					<span>最近消费时间：</span>
+					{if condition="$member_detail['last_pay_time']"}
+					<span>{:date('Y-m-d H:i:s',$member_detail['last_pay_time'])}</span>
+					{else /}
+					<span>--</span>
+					{/if}
+				</div>
+			</div>
+	</div>
+</div>
+
+<!--选择优惠券-->
+<div class="modal fade hide big" id="give-coupon" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="width: 800px;">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<h4 class="modal-title">选择优惠券</h4>
+			</div>
+			<div class="modal-body">
+				<table class="table-class" id="couponList">
+					<colgroup>
+						<col style="width: 5%;">
+						<col style="width: 35%;">
+						<col style="width: 20%;">
+						<col style="width: 40%;">
+					</colgroup>
+					<thead>
+						<tr align="center">
+							<th>
+								<i class="checkbox-common"><input type="checkbox" ></i>
+							</th>
+							<th style="text-align:left;">优惠券名称</th>
+							<th style="text-align:center;">未领取数</th>
+							<th style="text-align:left;">有效期限</th>
+						</tr>
+					</thead>
+					<tbody></tbody>
+				</table>
+			</div>
+			<div class="modal-footer">
+			</div>
+		</div>
+	</div>
+</div>
+<!-- 修改会员密码 -->
+<div class="modal fade hide" id="modify_password" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<h3>重置密码</h3>
+			</div>
+			<div class="modal-body">
+				<div class="modal-infp-style">
+					<table class="modal-tab">
+						<tr>
+							<td style="width:20%">密码</td>
+							<td colspan='3'><input type="text" id="modify_passwords" class="input-common"/></td>
+						</tr>
+					</table>
+				</div>
+			</div>
+			
+			<div class="modal-footer">
+				<button class="btn-common btn-big" onclick="modifypassword()">保存</button>
+				<button class="btn-common-cancle btn-big" data-dismiss="modal">关闭</button>
+			</div>
+		</div>
+	</div>
+</div>
+<input type="hidden" id="modify_userid" value="{$member_detail['uid']}" />
+
+<!-- 合并账户 -->
+<div style="width: 1280px;left: 30%;" class="modal fade hide" id="user_combine" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<h3>合并账户【操作不可逆，谨慎操作】</h3>
+			</div>
+			<div class="modal-body">
+				<table class="mytable">
+					<tr>
+						<th><label>用户ID：</label>
+							<input type="text" id ='user_id' placeholder="ID" value="" class="input-medium input-common middle"/>
+							
+							<label>用户账号：</label>
+							<input type="text" id ='user_name' placeholder="账号" value="" class="input-medium input-common middle"/>
+							<label for="pay_status">手机号码：</label>
+							<input type="text" id ='user_tel' placeholder="手机号码" value="" class="input-medium input-common middle"/>
+							<label for="pay_status">昵称</label>
+							<input type="text" id ='nick_name' placeholder="昵称" value="" class="input-medium input-common middle"/>
+							<input type="button" onclick="searchCombineUser()" value="搜索" class="btn-common"/>
+							<input type="button" onclick="autoMatchUser()" value="自动匹配关联用户" class="btn-common"/>
+						</th>
+					</tr>
+				</table>
+				<table class="table-class" style="width: 2200px;">
+					<colgroup>
+						<col style="width: 200px;">
+						<col>	
+						<col>	
+						<col style="width: 250px;">
+						<col style="width: 100px;">
+						<col style="width: 100px;">	
+						<col style="width: 100px;">
+						<col style="width: 270px;">
+						<col style="width: 270px;">
+						<col style="width: 270px;">	
+						<col style="width: 270px;">
+						<col style="width: 270px;">
+						<col style="width: 250px;">	
+						<col style="width: 270px;">
+					</colgroup>
+					<thead>
+						<tr align="left">
+							<th>操作码：<input type="text" id="ps_code" value="" class="input-mini"/></th>
+							<th>ID</th>
+							<th>账号</th>
+							<th>密码</th>
+							<th>电话</th>
+							<th>真实姓名</th>
+							<th>昵称</th>
+							<th>wx_info</th>
+							<th>公众号Openid</th>
+							<th>UnionID</th>
+							<th>小程序Openid</th>
+							<th>ali_user_id</th>
+							<th>ali_info</th>
+						</tr>
+					</thead>
+					<tbody></tbody>
+				</table>
+			</div>
+			<div class="modal-footer">
+				<button class="btn-common-cancle btn-big" data-dismiss="modal">关闭</button>
+			</div>
+		</div>
+	</div>
+</div>
+{/block}
+{block name="script"}
+
+<script type="text/javascript">
+/*
+    $(function(){
+		$("#front_img").attr("src","__ROOT__/template/wap/default/public/img/id_card/".$idcard_front_url);
+		$("#back_img").attr("src","__ROOT__/template/wap/default/public/img/id_card/".$idcard_back_url);
+		console.log($idcard_front_url);
+    });
+*/
+</script>
+
+<script>
+	//合并账户
+	function selectCombine(uid){
+		$("#user_combine").modal("show");
+		$("#user_name").val('');
+		$("#user_tel").val('');
+		$("#nick_name").val('');
+		autoMatchUser();
+	}
+
+	function autoMatchUser(){
+		$.ajax({
+			type : "post",
+			url : "{:__URL('ADMIN_MAIN/member/autoMatchUser')}",
+			data : {
+				"uid" : {$member_detail['uid']},
+				"autoget" : 1
+			},
+			success : function(data) {
+				combineUserData(data);
+				if(data.length ==1){
+					showTip('没有匹配到关联用户信息，请输入信息查询匹配用户','error');
+				}
+			}
+		});
+	}
+
+	function searchCombineUser(){
+		$.ajax({
+			type : "post",
+			url : "{:__URL('ADMIN_MAIN/member/autoMatchUser')}",
+			data : {
+				"uid" : {$member_detail['uid']},
+				"user_id" : $("#user_id").val(),
+				"user_name" : $("#user_name").val(),
+				"user_tel" : $("#user_tel").val(),
+				"nick_name" : $("#nick_name").val()
+			},
+			success : function(data) {
+				combineUserData(data);
+				if(data.length ==1){
+					showTip('没有查询到关联用户信息','error');
+				}
+			}
+		});
+	}
+
+	//绑定用户数据
+	function combineUserData(data){
+		if (data.length > 0) {
+			$(".table-class tbody").empty();
+			for (var i = 0; i < data.length; i++) {
+				var html = '';
+				if(i==0){
+					html += '<tr align="left" class="curuser">';
+					html += '<td>当前用户信息</td>';		
+				}else{
+					html += '<tr align="left">';
+					html += '<td><button onclick="doCombine('+data[i]["uid"] +',this)" class="btn-common btn-docombine">执行合并</button></td>';		
+				}	
+				html += '<td>' + data[i]["uid"] + '</td>';		
+				html += '<td>' + data[i]["user_name"] + '</td>';			
+				html += '<td>' + data[i]["user_password"] + '</td>';			
+				html += '<td>' + data[i]["user_tel"] + '</td>';		
+				html += '<td>' + data[i]["real_name"] + '</td>';				
+				html += '<td>' + data[i]["nick_name"] + '</td>';		
+				html += '<td style="max-width:200px; overflow:hidden;">' + data[i]["wx_info"] + '</td>';	
+				html += '<td>' + data[i]["wx_openid"] + '</td>';		
+				html += '<td>' + data[i]["wx_unionid"] + '</td>';
+				html += '<td>' + data[i]["wx_applet_openid"] + '</td>';
+				html += '<td>' + data[i]["ali_user_id"] + '</td>';
+				html += '<td>' + data[i]["ali_info"] + '</td>';
+				html += '</tr>';
+				$(".table-class tbody").append(html);
+			}
+		} else {
+			var html = '<tr align="center"><td colspan="9">暂无符合条件的数据记录</td></tr>';
+			$(".table-class tbody").html(html);
+		}
+	}
+
+	//执行用户合并
+	function doCombine(target_uid, evt){
+		console.log($('#ps_code').val());
+		if($('#ps_code').val() == ''){
+			showTip('请输入操作码','error');
+			return;
+		}
+		
+		if($('.btn-docombine').hasClass('btn-common-white')) return;
+		$( "#dialog" ).dialog({
+			buttons: {
+				"确定": function() {
+					$.ajax({
+						type : "post",
+						url : "{:__URL('ADMIN_MAIN/member/doCombine')}",
+						data : {
+							"uid" : {$member_detail['uid']},
+							"target_uid" : target_uid,
+							"ps_code" : $('#ps_code').val()
+						},
+						beforeSend : function(){
+							$('.btn-docombine').attr('class', 'btn-common-white btn-docombine').html('<i class="fa fa-refresh fa-spin"></i>正在执行...');
+							$('.btn-docombine').hide();
+							$(evt).show();
+						},
+						success : function(data) {
+							console.log(data);
+							if(data.code > 0){
+								showTip('账户合并成功','success',);
+								$("#user_name").val('');
+								$("#user_tel").val('');
+								$("#nick_name").val('');
+								$("#user_id").val('');
+								
+								autoMatchUser();
+							} else if(data['code'] == -2){
+								showTip('被合并的账户信息完整，无法进行合并','error');
+							} else if(data['code'] == -3){
+								showTip('请输入正确的合并用户操作码','error');
+							}else {
+								showTip('合并失败','error');
+							}
+							$('.btn-docombine').attr('class', 'btn-common btn-docombine').html('执行合并').show();
+						}
+					});
+					$(this).dialog('close');
+				},
+				"取消": function() {
+					$(this).dialog('close');
+				},
+			},
+			contentText: '此操作将把选中用户['+target_uid+']和当前详情页用户进行合并，合并成功后将清理已合并的多余用户数据，此操作不可逆，谨慎核对信息后再操作。确认要进行合并操作吗？',
+		});
+	}
+
+	
+
+
+	//修改选项标签
+	function modify_tab(uid, label_name_str, id){
+		$("#modify_tab").modal("show");
+		$("#modify_uid").val(uid);
+		$('#addSelectMemberLabel').val(label_name_str);
+		$('#addSelectMemberLabelId').val(id);
+	}
+	
+	//积分充值
+	function recharge_point(uid,point){
+		$("#recharge_point").modal("show");
+		$("#point_id").val(uid);
+		$("#current_point").text(point);
+	}
+	//余额充值
+	function recharge_balance(uid,balance){
+		$("#recharge_balance").modal("show");
+		$("#balance_id").val(uid);
+		$("#current_balance").text(balance);
+	}
+	// 账户调整
+	function account_update(uid,point,balance){
+		$("#point_id,#balance_id").val(uid);
+		$("#current_point").text(point);
+		$("#current_balance").text(balance);
+		$("#account_update").modal("show");
+	}
+	
+	$(".account_ul li").each(function(i){
+		$(".account_ul li").eq(i).click(function(){
+			$(".account_ul li").eq(i).addClass('account_active').siblings(".account_ul li").removeClass('account_active');
+			if(i==0){
+				// 积分
+				$(".account-point").show();
+				$(".account-balance").hide();
+			}else if(i==1){
+				// 余额
+				$(".account-point").hide();
+				$(".account-balance").show();
+			}
+		})
+		
+	});
+	
+	
+	//充值
+	function addAccount(type){
+		if(type == 1){
+			var id = $("#point_id").val();
+			var num = $("#point").val();
+			var current_point = $("#current_point").text();
+			var point = (parseInt(current_point) + parseInt(num));
+			if(num == ''){
+				showTip('积分不能为空','warning');
+				return false;
+			}
+			var text = $("#remark_point").val();
+			if(parseInt(point) < 0){
+				showTip('积分不能为负数','warning');
+				return false;
+			}
+		}else{
+			var id = $("#balance_id").val();
+			var num = $("#balance").val();
+			var current_balance = $("#current_balance").text();
+			var balance = (parseInt(current_balance) + parseInt(num));
+			if(num == ''){
+				showTip('余额不能为空','warning');
+				return false;
+			}
+			var text = $("#remark_balance").val();
+			if(parseInt(balance) < 0){
+				showTip('余额不能为负数','warning');
+				return false;
+			}
+		}
+		$.ajax({
+			type : "post",
+			url : "{:__URL('ADMIN_MAIN/member/addmemberaccount')}",
+			data : {
+				"id" : id,
+				"type" : type,
+				"num" : num,
+				"text" : text
+			},
+			success : function(data) {
+				if (data["code"] > 0) {
+					showTip(data['message'],'success');
+					$("#account_update").modal("hide");
+					window.location = window.location;
+				}else{
+					showTip(data['message'],'error');
+				}
+			}
+		});
+	}
+
+
+	
+// 赠送优惠券
+function giveCoupon(uid){
+	var html = '';
+	$.ajax({
+		type : "post",
+		url : "{:__URL('ADMIN_MAIN/promotion/sendcoupontypelist')}",
+		success : function(res) {
+			if (res.data.length > 0) {
+				res.data.forEach(function(item){
+					item.timeLimit = item.term_of_validity_type == 0 ? timeStampTurnTime(item.start_time)+'~'+timeStampTurnTime(item.end_time) : '领取之日起'+item.fixed_term+'天内有效';
+					item.surplusNum = item.count - item.get_num;
+
+					html += `<tr>
+						<td style="text-align:center;"><i class="checkbox-common"><input type="checkbox" value="`+ item.coupon_type_id +`"></i></td>
+						<td style="text-align:left;">`+ item.coupon_name +`</td>
+						<td style="text-align:center;">`+ item.surplusNum +`</td>
+						<td style="text-align:left;">`+item.timeLimit+`</td>
+					</tr>
+					`;
+				})
+			}else {
+				html += '<tr align="center"><td colspan="4">暂无符合条件的数据记录</td></tr>';
+			}
+			$('#couponList tbody').html(html);
+		}
+	})
+	$('#give-coupon .modal-footer').html('<button class="btn-common btn-big" onclick="confirmGiveCoupon('+ uid +')">确认</button><button class="btn-common-cancle btn-big" data-dismiss="modal" style="margin-left:5px!important">关闭</button>');
+	$("#give-coupon").modal("show");
+}
+
+function confirmGiveCoupon(uid){
+	var couponIdArr = [];
+	if ($('#couponList tbody [type="checkbox"]:checked').length) {
+		$('#couponList tbody [type="checkbox"]:checked').each(function(index, el) {
+			couponIdArr.push($(el).val());
+		});
+	}
+	if (!couponIdArr.length) {
+		showTip('请选择要赠送的优惠券' ,'warning');
+		return;
+	}
+	$.ajax({
+		type : "post",
+		url : "{:__URL('ADMIN_MAIN/member/giveCoupon')}",
+		data : {
+			uid : uid,
+			couponId : couponIdArr.toString()
+		},
+		success : function(res) {
+			$("#give-coupon").modal("hide");
+			if (res.code) {
+				showTip('优惠券发放成功' ,'success');
+			} else {
+				showTip(res.message ,'error');
+			}
+		}
+	})	
+}
+
+//模拟用户登陆
+function user_login(uid){
+	$.ajax({
+		type : "post",
+		url : "{:__URL('ADMIN_MAIN/member/sysLogin')}",
+		data : { "uid" : uid },
+		dataType: "JSON",
+		success : function(data) {
+			console.log(data);
+			console.log('token', data.token);
+			if (data.code > 0) {
+				$.ajax({
+					type: 'post',
+					url: __URL(SHOPMAIN + "/login/index"),
+					dataType: "JSON",
+					data: {token: data.token},
+					success: function (code) {
+						if (code == 1) {
+							window.open( __URL(SHOPMAIN + "/index/index"), "_blank");
+						} else {
+							showTip("登录失败",'error');
+						}
+					}
+				});
+			} else {
+				showTip("登录失败",'error');
+			}
+		}
+	});
+}
+
+//重置密码弹出
+function modify_password(){
+	$("#modify_password").modal("show");
+}
+
+//修改密码提交
+function modifypassword(){
+	var uid = $("#modify_userid").val();
+	var password = $("#modify_passwords").val(); 
+	if (password == null || password.length < 6) {
+		showTip('密码必须不小于6位！','warning');
+		return false;
+	}
+	$.ajax({
+		type : "post",
+		url : "{:__URL('ADMIN_MAIN/member/updatememberpassword')}",
+		data : {
+			'uid':uid,
+			'user_password' :password
+		},
+		success : function(data) {
+			if (data['code'] > 0) {
+				showTip('修改成功','success');
+				//LoadingInfo(getCurrentIndex(uid,'#productTbody'));
+				$("#modify_password").modal("hide");
+			} else {
+				showTip('修改失败','error');
+				flag = false;
+			}
+		}
+	});
+}
+
+//锁定会员
+function lockuser(uid){
+	$.ajax({
+		type : "post",
+		url : "{:__URL('ADMIN_MAIN/member/memberlock')}",
+		data : { "id" : uid },
+		success : function(data) {
+			if (data["code"] > 0) {
+				//LoadingInfo(getCurrentIndex(uid,'#productTbody'));
+				showTip(data['message'],'success');
+				setTimeout(function(){
+					window.location = window.location;
+				},1300);
+			}else{
+				showTip(data['message'],'error');
+			}
+		}
+	});
+}
+
+//解锁会员
+function unlockuser(uid){
+	$.ajax({
+		type : "post",
+		url : "{:__URL('ADMIN_MAIN/member/memberunlock')}",
+		data : { "id" : uid },
+		success : function(data) {
+			if (data["code"] > 0) {
+				//LoadingInfo(getCurrentIndex(uid,'#productTbody'));
+				showTip(data['message'],'success');
+				setTimeout(function(){
+					window.location = window.location;
+				},1300);
+			}else{
+				showTip(data['message'],'error');
+			}
+		}
+	});
+}
+
+</script>
+{/block}
