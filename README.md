@@ -7,3 +7,7 @@ For sending the products from Canada to China, customers need to provide their C
 Administrator can check the user's idcard in the member's detail web page. I upload my cute cat's photos as Id cards.
 <img width="500" alt="截屏2021-04-26 下午8 46 19" src="https://user-images.githubusercontent.com/43261388/116084558-846bd580-a6d0-11eb-80a9-e35d27edc580.png">
 
+It will suggest that you can only upload jpg and png files.
+<img width="500" src="https://user-images.githubusercontent.com/43261388/116380256-5e684180-a846-11eb-8b2b-9e0ff58799ef.png">
+
+
