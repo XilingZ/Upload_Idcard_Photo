@@ -3,7 +3,9 @@ Add an upload idcard photos functions to the e-commerce website
 
 For sending the products from Canada to China, customers need to provide their Chinese Idcard on their phones.
 <img width="350" src="https://user-images.githubusercontent.com/43261388/116084851-c9900780-a6d0-11eb-8c1a-332b3857f86d.jpeg">
+
 I also use picture to alter the original upload appearance and automated submit button.
+
 <img width="350" src="https://user-images.githubusercontent.com/43261388/116383012-0e3eae80-a849-11eb-8003-f0b71ec54207.png">
 
 
